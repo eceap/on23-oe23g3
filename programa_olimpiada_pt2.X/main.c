@@ -19,7 +19,7 @@
 
 /*==================[definiciones y macros]==================================*/
 typedef enum {
-    Einicio, Erecuperacion, Etesteo
+    Einicio, Erecuperacion, Etesteo,
 } estadoMEF_t;
 /*==================[definiciones de datos internos]=========================*/
 estadoMEF_t estadoActual; // Variable de estado (global)
@@ -52,26 +52,27 @@ void ActualizarMEF(void) {
     switch (estadoActual) {
         case Einicio:
             PIN_LED_INI = 1;
-            if (tickRead() - tInicio > 1000) {
+            if (tickRead() - (tInicio > 1000) ) {
+                fallas =0;
                 estadoActual = Etesteo; // pasa al estado de diagnostico
             }
-
             break;
         case Etesteo:
+            PIN_LED_INI = 0;
             if (PIN_F_A == 0) { //testeo el si el fusible esta abierto
                 PIN_LED_F_A = 1;
                 fallas++;
             }
 
             resultadoADC = adcRead(AIN2); //mido la salida del regulador interno
-            if (resultadoADC < 8900 && resultadoADC > 9300) { //si el valor de salida no está entre los 8,9 y los 9,3 prende los leds
+            if ( (resultadoADC < 8900) && (resultadoADC > 9300) ) { //si el valor de salida no está entre los 8,9 y los 9,3 prende los leds
                 PIN_LED_REG_INT = 1;
                 fallas++;
             }
 
             if (PIN_Q_CI == 1) { //testeo el funcionamiento del circuito integrado
                 tInicio = tickRead(); // También inicia temporizacion
-                if (tickRead() - tInicio > 11 && PIN_Q_CI != 0 || (PIN_Q_CI == PIN_Q_CI_NEG))
+                if ( ( ((tickRead() - tInicio)>11) && (PIN_Q_CI != 0 ) )|| (PIN_Q_CI == PIN_Q_CI_NEG) )
                     PIN_LED_CI = 1;
                 fallas++;
             }
@@ -79,14 +80,51 @@ void ActualizarMEF(void) {
             if (PIN_INI == 1) {
                 PIN_LED_TGENE = 1;
             }
-            
 
-            estadoActual = Erecuperacion; // pasa al estado de recuperacion
+            if (PIN_RES_NORM == 1 || fallas == 0) {
+                PIN_LED_NORM = 1;
+            } else {
+                PIN_LED_ERROR = 1;
+                PIN_SOUNDER = 1;
+            }
+             
+                estadoActual = Erecuperacion; // pasa al estado de recuperacion
+            
             break;
         case Erecuperacion:
+            if (PIN_F_A == 1) { //testeo el si el fusible esta abierto
+                PIN_LED_F_A = 0;
+                fallas--;
+            }
 
+            resultadoADC = adcRead(AIN2); //mido la salida del regulador interno
+            if (resultadoADC > 8900 && resultadoADC < 9300) { //si el valor de salida está entre los 8,9 y los 9,3 apaga los leds
+                PIN_LED_REG_INT = 0;
+                fallas--;
+            }
+
+            if (PIN_Q_CI == 1) { //testeo el funcionamiento del circuito integrado
+                tInicio = tickRead(); // También inicia temporizacion
+                if (tickRead() - tInicio > 11 && PIN_Q_CI == 0 && PIN_Q_CI == PIN_Q_CI_NEG)
+                    PIN_LED_CI = 0;
+                fallas--;
+            }
+
+            if (PIN_INI == 0) {
+                PIN_LED_TGENE = 0;
+            }
+
+            if (PIN_RES_NORM == 1) {
+                PIN_LED_NORM = 1;
+            } else {
+                PIN_LED_ERROR = 1;
+                PIN_SOUNDER = 1;
+            }
+
+            estadoActual = Etesteo; // pasa al estado de testeo
 
             break;
+
 
         default:
             InicializarMEF();
