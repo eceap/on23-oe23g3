@@ -19,7 +19,7 @@
 
 /*==================[definiciones y macros]==================================*/
 typedef enum {
-    Einicio, Erecuperacion, Etesteo,
+    Einicio, Erecuperacion, Etesteo,Ebuzzer
 } estadoMEF_t;
 /*==================[definiciones de datos internos]=========================*/
 estadoMEF_t estadoActual; // Variable de estado (global)
@@ -86,6 +86,7 @@ void ActualizarMEF(void) {
             } else {
                 PIN_LED_ERROR = 1;
                 PIN_SOUNDER = 1;
+                estadoActual = Ebuzzer;
             }
             
             
@@ -115,18 +116,23 @@ void ActualizarMEF(void) {
                 PIN_LED_TGENE = 0;
             }
 
-            if (PIN_RES_NORM == 1) {
-                PIN_LED_NORM = 1;
+            if (PIN_RES_NORM == 0) {
+                PIN_LED_NORM = 0;
             } else {
-                PIN_LED_ERROR = 1;
-                PIN_SOUNDER = 1;
+                PIN_LED_ERROR = 0;
+                PIN_SOUNDER = 0;
             }
 
             estadoActual = Etesteo; // pasa al estado de testeo
 
             break;
-
-
+        case Ebuzzer:
+            if (PIN_BUTTON == 1){
+                PIN_SOUNDER = 0;
+                estadoActual = Erecuperacion;
+            }
+            
+            break;
         default:
             InicializarMEF();
     }
