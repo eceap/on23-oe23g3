@@ -11,7 +11,7 @@ Alumnos| Julian Estruch
 |  | Nahuel Santillan
 |  | Valentino Spadotto
 Curso| 6°Electrónica
-Año| 20XX
+Año| 2023
 
 ## Descripción del Proyecto
 Texto.
