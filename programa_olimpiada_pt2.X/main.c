@@ -57,6 +57,7 @@ void ActualizarMEF(void) {
                 estadoActual = Etesteo; // pasa al estado de diagnostico
             }
             break;
+
         case Etesteo:
             PIN_LED_INI = 0;
             if (PIN_F_A == 0) { //testeo el si el fusible esta abierto
@@ -65,14 +66,14 @@ void ActualizarMEF(void) {
             }
 
             resultadoADC = adcRead(AIN2); //mido la salida del regulador interno
-            if ( (resultadoADC < 8900) && (resultadoADC > 9300) ) { //si el valor de salida no está entre los 8,9 y los 9,3 prende los leds
+            if ((resultadoADC < 8900) && (resultadoADC > 9300)) { //si el valor de salida no está entre los 8,9 y los 9,3 prende los leds
                 PIN_LED_REG_INT = 1;
                 fallas++;
             }
 
             if (PIN_Q_CI == 1) { //testeo el funcionamiento del circuito integrado
                 tInicio = tickRead(); // También inicia temporizacion
-                if ( ( ((tickRead() - tInicio)>11) && (PIN_Q_CI != 0 ) )|| (PIN_Q_CI == PIN_Q_CI_NEG) )
+                if ((((tickRead() - tInicio) > 11) && (PIN_Q_CI != 0)) || (PIN_Q_CI == PIN_Q_CI_NEG))
                     PIN_LED_CI = 1;
                 fallas++;
             }
@@ -88,12 +89,15 @@ void ActualizarMEF(void) {
                 PIN_SOUNDER = 1;
                 estadoActual = Ebuzzer;
             }
-            
-            
-                estadoActual = Erecuperacion; // pasa al estado de recuperacion
+
+            if (fallas>0){
+                estadoActual = Erecuperacion;
+            }
             
             break;
+
         case Erecuperacion:
+
             if (PIN_F_A == 1) { //testeo el si el fusible esta abierto
                 PIN_LED_F_A = 0;
                 fallas--;
@@ -118,12 +122,10 @@ void ActualizarMEF(void) {
 
             if (PIN_RES_NORM == 0) {
                 PIN_LED_NORM = 0;
-            } else {
-                PIN_LED_ERROR = 0;
-                PIN_SOUNDER = 0;
             }
-
-            estadoActual = Etesteo; // pasa al estado de testeo
+            if (fallas == 0){
+                estadoActual = Etesteo;
+            }
 
             break;
         case Ebuzzer:
