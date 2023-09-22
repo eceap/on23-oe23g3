@@ -87,7 +87,8 @@ void ActualizarMEF(void) {
                 PIN_LED_ERROR = 1;
                 PIN_SOUNDER = 1;
             }
-             
+            
+            
                 estadoActual = Erecuperacion; // pasa al estado de recuperacion
             
             break;
