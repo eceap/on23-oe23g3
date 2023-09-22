@@ -4,12 +4,12 @@ Para trabajar con el grupo de proyecto
 Completen con sus datos la siguiente tabla:
 Campo|Detalle
 ------|-----------
-Nombre de Proyecto| "Nnnn"
-Número de Grupo | x
-Alumnos| Nombre_Apellido1
-|  | Nombre_Apellido2
-|  | Nombre_Apellido3
-|  | Nombre_Apellido4
+Nombre de Proyecto| "Olimpiadas de electronica"
+Número de Grupo | 3
+Alumnos| Julian Estruch
+|  | Juan Pablo Fernandez  
+|  | Nahuel Santillan
+|  | Valentino Spadotto
 Curso| 6°Electrónica
 Año| 20XX
 
